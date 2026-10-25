@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фізика 7 клас: Фізичний калькулятор</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for menu */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-500 rounded-lg text-2xl">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold leading-tight">Фізика 7 клас</h1>
+                    <p class="text-xs md:text-sm text-indigo-200">Універсальний калькулятор формул</p>
+                </div>
+            </div>
+            <span class="text-xs bg-indigo-700 hover:bg-indigo-800 px-3 py-1 rounded-full text-indigo-100 hidden sm:inline-block">
+                Українська програма
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar / Navigation -->
+        <aside class="lg:col-span-4 xl:col-span-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200 h-fit">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-2">
+                Оберіть розділ / формулу
+            </h2>
+            <nav id="nav-menu" class="space-y-1">
+                <!-- Nav items generated via JavaScript -->
+            </nav>
+        </aside>
+
+        <!-- Calculator Content Area -->
+        <section class="lg:col-span-8 xl:col-span-9 flex flex-col space-y-6">
+            
+            <!-- Calculator Card -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex-1">
+                
+                <!-- Section Header -->
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <span id="topic-badge" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 mb-2">
+                        Розділ 1
+                    </span>
+                    <h2 id="topic-title" class="text-2xl font-bold text-slate-900">
+                        Швидкість, шлях, час
+                    </h2>
+                    <p id="topic-formula" class="text-sm font-mono text-indigo-600 font-semibold mt-1">
+                        v = S / t
+                    </p>
+                </div>
+
+                <!-- Sub-option Selector (Radio buttons / Tabs) -->
+                <div id="sub-options-container" class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Що шукаємо?</label>
+                    <div id="sub-options" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <!-- Sub-options generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Input Fields Form -->
+                <form id="calc-form" onsubmit="event.preventDefault(); calculate();" class="space-y-4">
+                    <div id="inputs-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Dynamic inputs inserted here -->
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="pt-4 flex flex-wrap gap-3">
+                        <button type="submit" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-sm transition-colors duration-150 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-calculator"></i>
+                            <span>Обчислити</span>
+                        </button>
+                        <button type="button" onclick="resetForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 px-4 rounded-lg transition-colors duration-150">
+                            Очистити
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Result Box -->
+                <div id="result-box" class="mt-6 p-4 rounded-lg bg-slate-50 border border-slate-200 hidden">
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Результат обчислення</h3>
+                    <div id="result-text" class="text-2xl font-bold text-indigo-600">
+                        --
+                    </div>
+                    <div id="formula-used" class="text-xs text-slate-500 mt-2 font-mono">
+                        <!-- Formula details -->
+                    </div>
+                </div>
+
+                <!-- Error Box -->
+                <div id="error-box" class="mt-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm hidden flex items-start space-x-2">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                    <span id="error-text">Помилка введення даних.</span>
+                </div>
+
+            </div>
+
+            <!-- Quick Physics Constants Card -->
+            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl flex items-center justify-between text-sm text-indigo-900">
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl">💡</span>
+                    <div>
+                        <span class="font-semibold">Довідка:</span> Прискорення вільного падіння прийнято рівним <code class="bg-indigo-100 px-1.5 py-0.5 rounded text-indigo-800 font-mono font-bold">g = 9.8 Н/кг</code>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            Калькулятор з фізики для 7 класу &bull; Всі формули перевірено
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Topics configuration data
+        const topics = [
+            {
+                id: "speed",
+                badge: "Розділ 1",
+                title: "Швидкість, шлях, час",
+                formula: "v = S / t",
+                icon: "fa-gauge-high",
+                subOptions: [
+                    { id: "v", name: "Швидкість (v)", unit: "м/с", formulaText: "v = S / t" },
+                    { id: "S", name: "Шлях (S)", unit: "м", formulaText: "S = v * t" },
+                    { id: "t", name: "Час (t)", unit: "с", formulaText: "t = S / v" }
+                ],
+                getInputs: (subId) => {
+                    if (subId === "v") return [
+                        { id: "S", label: "Шлях (S)", unit: "м", placeholder: "наприклад, 100" },
+                        { id: "t", label: "Час (t)", unit: "с", placeholder: "наприклад, 10" }
+                    ];
+                    if (subId === "S") return [
+                        { id: "v", label: "Швидкість (v)", unit: "м/с", placeholder: "наприклад, 10" },
+                        { id: "t", label: "Час (t)", unit: "с", placeholder: "наприклад, 5" }
+                    ];
+                    if (subId === "t") return [
+                        { id: "S", label: "Шлях (S)", unit: "м", placeholder: "наприклад, 100" },
+                        { id: "v", label: "Швидкість (v)", unit: "м/с", placeholder: "наприклад, 20" }
+                    ];
+                },
+                calc: (subId, inputs) => {
+                    if (subId === "v") {
+                        if (inputs.t === 0) throw new Error("Час (t) не може дорівнювати нулю.");
+                        const res = inputs.S / inputs.t;
+                        return { val: res, label: "Швидкість (v)", unit: "м/с" };
+                    }
+                    if (subId === "S") {
+                        const res = inputs.v * inputs.t;
+                        return { val: res, label: "Шлях (S)", unit: "м" };
+                    }
+                    if (subId === "t") {
+                        if (inputs.v === 0) throw new Error("Швидкість (v) не може дорівнювати нулю.");
+                        const res = inputs.S / inputs.v;
+                        return { val: res, label: "Час (t)", unit: "с" };
+                    }
+                }
+            },
+            {
+                id: "density",
+                badge: "Розділ 2",
+                title: "Густина, маса, об'єм",
+                formula: "ρ = m / V",
+                icon: "fa-cube",
+                subOptions: [
+                    { id: "rho", name: "Густина (ρ)", unit: "кг/м³", formulaText: "ρ = m / V" },
+                    { id: "m", name: "Маса (m)", unit: "кг", formulaText: "m = ρ * V" },
+                    { id: "V", name: "Об'єм (V)", unit: "м³", formulaText: "V = m / ρ" }
+                ],
+                getInputs: (subId) => {
+                    if (subId === "rho") return [
+                        { id: "m", label: "Маса (m)", unit: "кг", placeholder: "наприклад, 1000" },
+                        { id: "V", label: "Об'єм (V)", unit: "м³", placeholder: "наприклад, 1" }
+                    ];
+                    if (subId === "m") return [
+                        { id: "rho", label: "Густина (ρ)", unit: "кг/м³", placeholder: "наприклад, 1000" },
+                        { id: "V", label: "Об'єм (V)", unit: "м³", placeholder: "наприклад, 2" }
+                    ];
+                    if (subId === "V") return [
+                        { id: "m", label: "Маса (m)", unit: "кг", placeholder: "наприклад, 500" },
+                        { id: "rho", label: "Густина (ρ)", unit: "кг/м³", placeholder: "наприклад, 1000" }
+                    ];
+                },
+                calc: (subId, inputs) => {
+                    if (subId === "rho") {
+                        if (inputs.V === 0) throw new Error("Об'єм (V) не може дорівнювати нулю.");
+                        const res = inputs.m / inputs.V;
+                        return { val: res, label: "Густина (ρ)", unit: "кг/м³" };
+                    }
+                    if (subId === "m") {
+                        const res = inputs.rho * inputs.V;
+                        return { val: res, label: "Маса (m)", unit: "кг" };
+                    }
+                    if (subId === "V") {
+                        if (inputs.rho === 0) throw new Error("Густина (ρ) не може дорівнювати нулю.");
+                        const res = inputs.m / inputs.rho;
+                        return { val: res, label: "Об'єм (V)", unit: "м³" };
+                    }
+                }
+            },
+            {
+                id: "gravity",
+                badge: "Розділ 3",
+                title: "Сила тяжіння",
+                formula: "F = m * g",
+                icon: "fa-apple-whole",
+                subOptions: [
+                    { id: "F", name: "Сила тяжіння (F)", unit: "Н", formulaText: "F = m * g (g = 9.8 Н/кг)" }
+                ],
+                getInputs: () => [
+                    { id: "m", label: "Маса (m)", unit: "кг", placeholder: "наприклад, 50" }
+                ],
+                calc: (subId, inputs) => {
+                    const g = 9.8;
+                    const res = inputs.m * g;
+                    return { val: res, label: "Сила тяжіння (F)", unit: "Н" };
+                }
+            },
+            {
+                id: "pressure_solid",
+                badge: "Розділ 4",
+                title: "Тиск твердих тіл",
+                formula: "p = F / S",
+                icon: "fa-down-left-and-up-right-to-center",
+                subOptions: [
+                    { id: "p", name: "Тиск (p)", unit: "Па", formulaText: "p = F / S" }
+                ],
+                getInputs: () => [
+                    { id: "F", label: "Сила (F)", unit: "Н", placeholder: "наприклад, 200" },
+                    { id: "S", label: "Площа опори (S)", unit: "м²", placeholder: "наприклад, 0.5" }
+                ],
+                calc: (subId, inputs) => {
+                    if (inputs.S === 0) throw new Error("Площа (S) не може дорівнювати нулю.");
+                    const res = inputs.F / inputs.S;
+                    return { val: res, label: "Тиск (p)", unit: "Па" };
+                }
+            },
+            {
+                id: "pressure_hydro",
+                badge: "Розділ 5",
+                title: "Гідростатичний тиск",
+                formula: "p = ρ * g * h",
+                icon: "fa-water",
+                subOptions: [
+                    { id: "p", name: "Гідростатичний тиск (p)", unit: "Па", formulaText: "p = ρ * g * h (g = 9.8 Н/кг)" }
+                ],
+                getInputs: () => [
+                    { id: "rho", label: "Густина рідини (ρ)", unit: "кг/м³", placeholder: "наприклад, 1000 (вода)" },
+                    { id: "h", label: "Висота стовпа рідини (h)", unit: "м", placeholder: "наприклад, 10" }
+                ],
+                calc: (subId, inputs) => {
+                    const g = 9.8;
+                    const res = inputs.rho * g * inputs.h;
+                    return { val: res, label: "Гідростатичний тиск (p)", unit: "Па" };
+                }
+            },
+            {
+                id: "archimedes",
+                badge: "Розділ 6",
+                title: "Архімедова сила",
+                formula: "F_A = ρ * g * V",
+                icon: "fa-ship",
+                subOptions: [
+                    { id: "FA", name: "Архімедова сила (F_A)", unit: "Н", formulaText: "F_A = ρ * g * V (g = 9.8 Н/кг)" }
+                ],
+                getInputs: () => [
+                    { id: "rho", label: "Густина рідини (ρ)", unit: "кг/м³", placeholder: "наприклад, 1000" },
+                    { id: "V", label: "Занурений об'єм (V)", unit: "м³", placeholder: "наприклад, 0.05" }
+                ],
+                calc: (subId, inputs) => {
+                    const g = 9.8;
+                    const res = inputs.rho * g * inputs.V;
+                    return { val: res, label: "Архімедова сила (F_A)", unit: "Н" };
+                }
+            },
+            {
+                id: "work",
+                badge: "Розділ 7",
+                title: "Механічна робота",
+                formula: "A = F * s",
+                icon: "fa-gears",
+                subOptions: [
+                    { id: "A", name: "Робота (A)", unit: "Дж", formulaText: "A = F * s" }
+                ],
+                getInputs: () => [
+                    { id: "F", label: "Сила (F)", unit: "Н", placeholder: "наприклад, 150" },
+                    { id: "s", label: "Переміщення (s)", unit: "м", placeholder: "наприклад, 10" }
+                ],
+                calc: (subId, inputs) => {
+                    const res = inputs.F * inputs.s;
+                    return { val: res, label: "Механічна робота (A)", unit: "Дж" };
+                }
+            },
+            {
+                id: "power",
+                badge: "Розділ 8",
+                title: "Потужність",
+                formula: "N = A / t",
+                icon: "fa-bolt",
+                subOptions: [
+                    { id: "N", name: "Потужність (N)", unit: "Вт", formulaText: "N = A / t" }
+                ],
+                getInputs: () => [
+                    { id: "A", label: "Робота (A)", unit: "Дж", placeholder: "наприклад, 1500" },
+                    { id: "t", label: "Час (t)", unit: "с", placeholder: "наприклад, 5" }
+                ],
+                calc: (subId, inputs) => {
+                    if (inputs.t === 0) throw new Error("Час (t) не може дорівнювати нулю.");
+                    const res = inputs.A / inputs.t;
+                    return { val: res, label: "Потужність (N)", unit: "Вт" };
+                }
+            },
+            {
+                id: "energy",
+                badge: "Розділ 9",
+                title: "Енергія",
+                formula: "E_p = m*g*h | E_k = m*v²/2",
+                icon: "fa-atom",
+                subOptions: [
+                    { id: "Ep", name: "Потенціальна (E_p)", unit: "Дж", formulaText: "E_p = m * g * h" },
+                    { id: "Ek", name: "Кінетична (E_k)", unit: "Дж", formulaText: "E_k = 0.5 * m * v²" }
+                ],
+                getInputs: (subId) => {
+                    if (subId === "Ep") return [
+                        { id: "m", label: "Маса (m)", unit: "кг", placeholder: "наприклад, 2" },
+                        { id: "h", label: "Висота (h)", unit: "м", placeholder: "наприклад, 10" }
+                    ];
+                    if (subId === "Ek") return [
+                        { id: "m", label: "Маса (m)", unit: "кг", placeholder: "наприклад, 2" },
+                        { id: "v", label: "Швидкість (v)", unit: "м/с", placeholder: "наприклад, 5" }
+                    ];
+                },
+                calc: (subId, inputs) => {
+                    if (subId === "Ep") {
+                        const g = 9.8;
+                        const res = inputs.m * g * inputs.h;
+                        return { val: res, label: "Потенціальна енергія (E_p)", unit: "Дж" };
+                    }
+                    if (subId === "Ek") {
+                        const res = 0.5 * inputs.m * (inputs.v ** 2);
+                        return { val: res, label: "Кінетична енергія (E_k)", unit: "Дж" };
+                    }
+                }
+            }
+        ];
+
+        // Current Active State
+        let currentTopic = topics[0];
+        let currentSubOption = currentTopic.subOptions[0];
+
+        // Initialize UI
+        window.addEventListener('DOMContentLoaded', () => {
+            renderNavMenu();
+            selectTopic(topics[0].id);
+        });
+
+        // Render Sidebar Navigation
+        function renderNavMenu() {
+            const nav = document.getElementById('nav-menu');
+            nav.innerHTML = topics.map(t => `
+                <button onclick="selectTopic('${t.id}')" id="nav-btn-${t.id}"
+                    class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-3 hover:bg-slate-100 text-slate-700">
+                    <i class="fa-solid ${t.icon} w-5 text-center text-slate-400"></i>
+                    <span class="truncate">${t.title}</span>
+                </button>
+            `).join('');
+        }
+
+        // Select a Main Topic
+        function selectTopic(topicId) {
+            currentTopic = topics.find(t => t.id === topicId);
+            currentSubOption = currentTopic.subOptions[0];
+
+            // Update Nav Active States
+            topics.forEach(t => {
+                const btn = document.getElementById(`nav-btn-${t.id}`);
+                if (t.id === topicId) {
+                    btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-3 bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600 shadow-sm";
+                    btn.querySelector('i').className = `fa-solid ${t.icon} w-5 text-center text-indigo-600`;
+                } else {
+                    btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 flex items-center space-x-3 hover:bg-slate-100 text-slate-700";
+                    btn.querySelector('i').className = `fa-solid ${t.icon} w-5 text-center text-slate-400`;
+                }
+            });
+
+            // Update Header Info
+            document.getElementById('topic-badge').innerText = currentTopic.badge;
+            document.getElementById('topic-title').innerText = currentTopic.title;
+            document.getElementById('topic-formula').innerText = currentTopic.formula;
+
+            // Render Sub Options
+            renderSubOptions();
+            // Render Input Fields
+            renderInputs();
+            // Clear Result Box
+            hideResultAndError();
+        }
+
+        // Render Sub Option Radio Buttons / Tabs
+        function renderSubOptions() {
+            const container = document.getElementById('sub-options');
+            
+            // Hide sub-options container if there's only 1 option
+            if (currentTopic.subOptions.length <= 1) {
+                document.getElementById('sub-options-container').classList.add('hidden');
+                return;
+            } else {
+                document.getElementById('sub-options-container').classList.remove('hidden');
+            }
+
+            container.innerHTML = currentTopic.subOptions.map(sub => `
+                <label class="cursor-pointer border rounded-lg p-2.5 flex items-center space-x-2 text-sm transition-all ${sub.id === currentSubOption.id ? 'bg-indigo-50 border-indigo-500 text-indigo-800 font-medium ring-1 ring-indigo-500' : 'border-slate-200 hover:bg-slate-50 text-slate-700'}">
+                    <input type="radio" name="subOption" value="${sub.id}" ${sub.id === currentSubOption.id ? 'checked' : ''} onchange="selectSubOption('${sub.id}')" class="text-indigo-600 focus:ring-indigo-500">
+                    <span>${sub.name}</span>
+                </label>
+            `).join('');
+        }
+
+        // Select Sub Option
+        function selectSubOption(subId) {
+            currentSubOption = currentTopic.subOptions.find(s => s.id === subId);
+            renderSubOptions();
+            renderInputs();
+            hideResultAndError();
+        }
+
+        // Render Inputs Dynamically
+        function renderInputs() {
+            const inputsContainer = document.getElementById('inputs-container');
+            const fields = currentTopic.getInputs(currentSubOption.id);
+
+            inputsContainer.innerHTML = fields.map(f => `
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1" for="input-${f.id}">
+                        ${f.label}
+                    </label>
+                    <div class="relative rounded-md shadow-sm">
+                        <input type="number" step="any" id="input-${f.id}" data-id="${f.id}" placeholder="${f.placeholder}"
+                            class="w-full bg-slate-50 border border-slate-300 rounded-lg py-2 pl-3 pr-12 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+                            oninput="hideResultAndError()">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-slate-400 text-xs font-medium">${f.unit}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Calculate Result
+        function calculate() {
+            hideResultAndError();
+
+            const fields = currentTopic.getInputs(currentSubOption.id);
+            const inputValues = {};
+
+            // Validate and parse inputs
+            for (let f of fields) {
+                const el = document.getElementById(`input-${f.id}`);
+                const val = el.value.trim();
+
+                if (val === '') {
+                    showError(`Будь ласка, заповніть поле "${f.label}".`);
+                    return;
+                }
+
+                const num = parseFloat(val);
+                if (isNaN(num)) {
+                    showError(`Введено некоректне число у полі "${f.label}".`);
+                    return;
+                }
+
+                inputValues[f.id] = num;
+            }
+
+            try {
+                // Execute math formula
+                const res = currentTopic.calc(currentSubOption.id, inputValues);
+                showResult(res.val, res.label, res.unit);
+            } catch (err) {
+                showError(err.message || "Помилка при обчисленні.");
+            }
+        }
+
+        // Show Result Display
+        function showResult(value, label, unit) {
+            const resultBox = document.getElementById('result-box');
+            const resultText = document.getElementById('result-text');
+            const formulaUsed = document.getElementById('formula-used');
+
+            // Format float neatly (up to 2-3 decimal places if needed)
+            const formattedVal = Number.isInteger(value) ? value : parseFloat(value.toFixed(2));
+
+            resultText.innerText = `${label} = ${formattedVal} ${unit}`;
+            formulaUsed.innerText = `Формула: ${currentSubOption.formulaText}`;
+
+            resultBox.classList.remove('hidden');
+        }
+
+        // Show Error Box
+        function showError(msg) {
+            const errorBox = document.getElementById('error-box');
+            const errorText = document.getElementById('error-text');
+            errorText.innerText = msg;
+            errorBox.classList.remove('hidden');
+        }
+
+        // Hide Result and Error
+        function hideResultAndError() {
+            document.getElementById('result-box').classList.add('hidden');
+            document.getElementById('error-box').classList.add('hidden');
+        }
+
+        // Reset Current Form
+        function resetForm() {
+            const inputs = document.querySelectorAll('#inputs-container input');
+            inputs.forEach(input => input.value = '');
+            hideResultAndError();
+        }
+    </script>
+</body>
+</html>
